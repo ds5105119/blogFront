@@ -37,6 +37,3 @@ next-env.d.ts
 
 # prettier
 .prettierrc
-
-# tailwind
-tailwind.config.ts

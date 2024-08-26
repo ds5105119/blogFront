@@ -2,6 +2,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import Button from "@/components/button";
+import Navbar from "@/components/navBar";
 
 const Editor = dynamic(() => import("@/components/editor/Editor"), {
   ssr: false,
@@ -14,6 +15,8 @@ const MDXEditorProps = {
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Navbar></Navbar>
+
       <div style={{ border: "1px solid black" }}>
         <Suspense fallback={null}>
           <Editor editorRef={null} markdown="# 시작하기" />
