@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaCompass, FaRegCompass } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { GoHome, GoHomeFill } from "react-icons/go";
 
-type StringIndexedArray<T> = { [key: string]: T };
+type StringIndexedArray<T> = {
+  [key: string]: T;
+};
 
 export default function Navbar(props: {
   profileURL?: string;
@@ -15,6 +19,7 @@ export default function Navbar(props: {
 }) {
   const { profileURL = null, isAuth = null, currentTab = null } = props;
 
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [tabStatus, setTabStatus] = useState<StringIndexedArray<boolean>>(
     currentTab ??
@@ -44,6 +49,7 @@ export default function Navbar(props: {
   };
   const toggleHomeTab = () => {
     changeTab("Home");
+    router.push(process.env.NEXT_PUBLIC_BASE_URL || "/");
   };
   const toggleSearchTab = () => {
     changeTab("Search");
@@ -55,8 +61,12 @@ export default function Navbar(props: {
         {/* Logo */}
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <div className="w-full">
-              <a href="#" className="flex-shrink-0">
+            <div className="flex w-full items-center">
+              <button
+                onClick={toggleHomeTab}
+                type="button"
+                className="flex-shrink-0"
+              >
                 <svg
                   className="w-7 h-7"
                   viewBox="0 0 550 317"
@@ -76,7 +86,7 @@ export default function Navbar(props: {
                     fill="black"
                   />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
 

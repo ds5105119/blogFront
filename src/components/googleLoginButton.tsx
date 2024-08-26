@@ -1,20 +1,22 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-const GoogleLoginButton = () => {
-  const handleLogin = () => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`;
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile`;
+interface GoogleLoginButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  status: boolean;
+  children?: ReactNode;
+}
 
-    window.open(googleAuthUrl, "_blank", "width=500,height=600");
-  };
-
+const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
+  children = "Continue with Google",
+  className = "",
+  ...props
+}) => {
   return (
     <button
-      onClick={handleLogin}
-      className="w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg border border-gray-300 shadow-md hover:shadow-lg active:shadow-md transition duration-200 flex items-center justify-center space-x-2"
+      className={`w-full py-3 px-4 bg-white text-gray-800 font-semibold rounded-lg border border-gray-300 shadow-md hover:shadow-lg active:shadow-md transition duration-200 flex items-center justify-center space-x-2 ${className}`}
+      {...props}
     >
-      <svg className="w-5 h-5" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
         <path
           fill="#4285F4"
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -33,7 +35,7 @@ const GoogleLoginButton = () => {
         />
         <path fill="none" d="M1 1h22v22H1z" />
       </svg>
-      <span>Google로 계속하기</span>
+      {children}
     </button>
   );
 };
