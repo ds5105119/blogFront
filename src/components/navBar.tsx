@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { FaCompass, FaRegCompass } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { GoHome, GoHomeFill } from "react-icons/go";
+import { RiCommandFill } from "react-icons/ri";
 
 type StringIndexedArray<T> = {
   [key: string]: T;
@@ -114,7 +115,7 @@ export default function Navbar(props: {
                 {tabStatus["Home"] ? (
                   <GoHomeFill className="w-[28px] h-[28px] group-hover:w-[30px] group-hover:h-[30px] transition-all duration-150" />
                 ) : (
-                  <GoHome className="w-[28px] h-[28px] group-hover:w-[30px] group-hover:h-[30px] transition-all duration-150" />
+                  <GoHome className="w-[28px] h-[28px] stroke-[0.2px] group-hover:w-[30px] group-hover:h-[30px] transition-all duration-150" />
                 )}
               </button>
             </div>
@@ -144,9 +145,9 @@ export default function Navbar(props: {
               >
                 <span className="sr-only">검색</span>
                 {tabStatus["Search"] ? (
-                  <IoSearch className="w-[26px] h-[26px] stroke-[20px] group-hover:w-[28px] group-hover:h-[28px] transition-all duration-150" />
+                  <RiCommandFill className="w-[27px] h-[27px] stroke-[0.8px] group-hover:w-[28px] group-hover:h-[28px] transition-all duration-150" />
                 ) : (
-                  <IoSearch className="w-[26px] h-[26px] group-hover:w-[28px] group-hover:h-[28px] transition-all duration-150" />
+                  <RiCommandFill className="w-[27px] h-[27px] group-hover:w-[28px] group-hover:h-[28px] transition-all duration-150" />
                 )}
               </button>
             </div>

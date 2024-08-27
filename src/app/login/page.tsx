@@ -1,16 +1,11 @@
 "use client";
-
-import { useAuth } from "@/hooks/useAuth";
-import { FaUser } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axiosInstance";
-import { setAccessToken, setRefreshToken, clearTokens } from "@/lib/authToken";
-import axios from "axios";
+import AnimatedGradientText from "@/components/animatedGradientText";
 import GoogleLoginButton from "@/components/googleLoginButton";
 import NavBar from "@/components/navBar";
-import AnimatedGradientText from "@/components/animatedGradientText";
 import { generateRandomString, openCenteredWindow } from "@/lib/tools";
+import { useLogin } from "@/hooks/useAuth";
 
 type GoogleLoginEvent = {
   type: "GOOGLE_LOGIN";
@@ -27,20 +22,21 @@ const gradients = [
   "from-yellow-400 via-red-500 to-pink-500",
 ];
 
-const login = async (authCode: string) => {
-  const { data } = await axiosInstance.post<{
-    access: string;
-    refresh: string;
-  }>("/accounts/google/login/", { code: authCode });
-  setAccessToken(data.access);
-  setRefreshToken(data.refresh);
-  return data;
-};
-
 export default function Login() {
+  // code 관련
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState("");
+  // token 관련
+  const { mutate, isPending, isError, error, isSuccess } = useLogin();
 
-  const handleGoogleLogin = () => {
+  const handelGetToken = () => {
+    mutate({
+      code: code,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}${process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI}`,
+    });
+  };
+
+  const handelGetCode = () => {
     setIsLoading(true);
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/login/callback/`;
@@ -60,13 +56,14 @@ export default function Login() {
         clearInterval(checkPopup);
         setIsLoading(false);
 
-        // 팝업이 닫힌 후 localStorage에서 인증 코드 확인
-        const code = localStorage.getItem("googleAuthCode");
+        const receivedCode = localStorage.getItem("googleAuthCode");
         const receivedState = localStorage.getItem("googleAuthState");
 
-        if (code && receivedState === state) {
+        if (receivedCode != null && receivedState === state) {
+          setCode(receivedCode);
           localStorage.removeItem("googleAuthCode");
           localStorage.removeItem("googleAuthState");
+          handelGetToken();
         }
       }
     }, 300);
@@ -89,7 +86,7 @@ export default function Login() {
           <div>
             <GoogleLoginButton
               isLoading={isLoading}
-              onClick={handleGoogleLogin}
+              onClick={handelGetCode}
               disabled={isLoading}
             >
               Google로 로그인

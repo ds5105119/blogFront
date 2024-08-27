@@ -17,7 +17,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     <button
       className={`w-full h-14 bg-white text-gray-800 font-semibold rounded-lg border border-gray-300 transition duration-200 flex items-center justify-center ${
         isLoading
-          ? "bg-gray-100 cursor-not-allowed"
+          ? "bg-gray-200 cursor-not-allowed"
           : "hover:shadow-md active:shadow-md"
       } ${className}`}
       disabled={isLoading}

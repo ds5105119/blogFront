@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { setAccessToken, setRefreshToken, clearTokens } from "@/lib/authToken";
 
+// 유저 타입 정의
 interface User {
   id: string;
   username: string;
@@ -9,57 +10,60 @@ interface User {
   profileImageURL: string;
 }
 
-const fetchUserProfile = async (): Promise<User> => {
-  const { data } = await axiosInstance.get<User>("/accounts/user/");
-  return data;
+// 토큰 타입 정의
+type Tokens = {
+  access: string;
+  refresh: string;
 };
 
-const loginx = async (code: string): Promise<string> => {
-  if (!process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI) {
-    throw new Error("NEXT_PUBLIC_GOOGLE_LOGIN_URI is not defined");
-  }
+// useAuth 훅 반환 타입 정의
+type UseLoginReturn = {
+  mutate: (variables: { code: string; url: string }) => void;
+  isPending: boolean;
+  isError: boolean;
+  error: unknown;
+  isSuccess: boolean;
+};
 
-  const response = await axiosInstance.post(
-    process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI,
+// 로그인 함수
+const login = async (code: string, url: string): Promise<Tokens> => {
+  const response = await axiosInstance.post<Tokens>(
+    url,
+    { access_token: "", code: code, id_token: "" },
     {
-      code: code,
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
   );
-  return response.data;
+  console.log(response.data);
 
-  setAccessToken(data.access);
-  setRefreshToken(data.refresh);
-  return data;
+  return response.data;
 };
 
-const login = useMutation<string>(loginx);
-
-export const useAuth = () => {
+// 커스텀 훅: useLogin
+export const useLogin = (): UseLoginReturn => {
   const queryClient = useQueryClient();
 
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useQuery<User>({ queryKey: ["user"], queryFn: fetchUserProfile });
-
-  const loginMutation = useMutation({
-    mutationFn: login,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["user"]); // 로그인 성공 시 유저 정보 다시 가져옴
+  const { mutate, isPending, isError, error, isSuccess } = useMutation({
+    mutationFn: (variables: { code: string; url: string }) =>
+      login(variables.code, variables.url),
+    onSuccess: (data) => {
+      const { access, refresh } = data;
+      setAccessToken(access);
+      setRefreshToken(refresh);
+    },
+    onError: (error) => {
+      console.error("로그인 오류:", error);
+      // 여기에 추가적인 에러 처리 로직을 구현할 수 있습니다.
     },
   });
 
-  const logout = () => {
-    clearTokens();
-    queryClient.invalidateQueries(["user"]); // 로그아웃 시 유저 정보 초기화
-  };
-
   return {
-    user,
-    isLoading,
+    mutate,
+    isPending,
     isError,
-    login: loginMutation.mutate,
-    logout,
+    error,
+    isSuccess,
   };
 };
