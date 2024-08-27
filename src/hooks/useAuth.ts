@@ -55,7 +55,6 @@ export const useLogin = (): UseLoginReturn => {
     },
     onError: (error) => {
       console.error("로그인 오류:", error);
-      // 여기에 추가적인 에러 처리 로직을 구현할 수 있습니다.
     },
   });
 
