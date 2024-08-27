@@ -10,6 +10,12 @@ import axios from "axios";
 import GoogleLoginButton from "@/components/googleLoginButton";
 import NavBar from "@/components/navBar";
 import AnimatedGradientText from "@/components/animatedGradientText";
+import { generateRandomString, openCenteredWindow } from "@/lib/tools";
+
+type GoogleLoginEvent = {
+  type: "GOOGLE_LOGIN";
+  code: string;
+};
 
 const texts = ["안녕하세요", "Hello", "Bonjour", "你好", "こんにちは"];
 
@@ -31,49 +37,6 @@ const login = async (authCode: string) => {
   return data;
 };
 
-function openCenteredWindow(url: string, width: number, height: number): void {
-  // 화면의 가로, 세로 크기
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-
-  // 새 창의 크기
-  const left = screenWidth / 2 - width / 2;
-  const top = screenHeight / 2 - height / 2;
-
-  // 새 창 열기
-  window.open(
-    url,
-    "_blank",
-    `noopener,noreferrer,width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`,
-  );
-}
-
-function TypingEffect({ text }: { text: string }) {
-  const [displayText, setDisplayText] = useState("");
-  const typingSpeed = 100; // 타이핑 속도 (밀리초 단위)
-
-  useEffect(() => {
-    let i = 0;
-    const typingInterval = setInterval(() => {
-      if (i < text.length) {
-        setDisplayText((prev) => prev + text.charAt(i));
-        i++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, typingSpeed);
-
-    return () => clearInterval(typingInterval);
-  }, [text]);
-
-  return (
-    <h2 className="text-3xl font-semibold mb-6 h-12">
-      {displayText}
-      <span className="animate-blink">|</span>
-    </h2>
-  );
-}
-
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -81,17 +44,39 @@ export default function Login() {
     setIsLoading(true);
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/login/callback/`;
-    const scope = "openid%20email%20profile";
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    const scope = "email+profile";
+    const state = generateRandomString(16);
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=${scope}&state=${state}&client_id=${clientId}&redirect_uri=${redirectUri}`;
 
-    openCenteredWindow(authUrl, 800, 600);
+    const popup: Window | null = openCenteredWindow(authUrl, 600, 700);
+    console.log(popup);
+
+    if (!popup) {
+      setIsLoading(false);
+    }
+
+    const checkPopup = setInterval(() => {
+      if (popup && popup.closed) {
+        clearInterval(checkPopup);
+        setIsLoading(false);
+
+        // 팝업이 닫힌 후 localStorage에서 인증 코드 확인
+        const code = localStorage.getItem("googleAuthCode");
+        const receivedState = localStorage.getItem("googleAuthState");
+
+        if (code && receivedState === state) {
+          localStorage.removeItem("googleAuthCode");
+          localStorage.removeItem("googleAuthState");
+        }
+      }
+    }, 300);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-white to-purple-50-50">
+    <div className="flex flex-col min-h-screen bg-white">
       <NavBar />
-      <div className="flex flex-col items-center justify-center flex-grow">
-        <div className="bg-white p-8 rounded-2xl shadow-md max-w-md w-full mx-4 transform hover:scale-105 transition-all duration-300">
+      <div className="flex flex-col items-center justify-center flex-grow ">
+        <div className="bg-white p-8 rounded-2xl shadow-primary max-w-md w-full mx-4 transform hover:scale-[1.02] transition-all duration-300">
           <div className="text-center">
             <p className="text-gray-600 mb-8">
               Start using IIH for yourself or your team
@@ -102,17 +87,13 @@ export default function Login() {
             <p className="text-gray-600 mb-8">Google 계정으로 로그인하세요</p>
           </div>
           <div>
-            {!isLoading ? (
-              <GoogleLoginButton
-                status={isLoading}
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-              >
-                Google로 로그인
-              </GoogleLoginButton>
-            ) : (
-              <div>제발</div>
-            )}
+            <GoogleLoginButton
+              isLoading={isLoading}
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+            >
+              Google로 로그인
+            </GoogleLoginButton>
           </div>
           <p className="mt-6 text-center text-sm text-gray-600">
             계정이 없으신가요?{" "}

@@ -14,15 +14,25 @@ const fetchUserProfile = async (): Promise<User> => {
   return data;
 };
 
-const login = async (authCode: string) => {
-  const { data } = await axiosInstance.post<{
-    access: string;
-    refresh: string;
-  }>("/accounts/login/google/", { code: authCode });
+const loginx = async (code: string): Promise<string> => {
+  if (!process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI) {
+    throw new Error("NEXT_PUBLIC_GOOGLE_LOGIN_URI is not defined");
+  }
+
+  const response = await axiosInstance.post(
+    process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI,
+    {
+      code: code,
+    },
+  );
+  return response.data;
+
   setAccessToken(data.access);
   setRefreshToken(data.refresh);
   return data;
 };
+
+const login = useMutation<string>(loginx);
 
 export const useAuth = () => {
   const queryClient = useQueryClient();

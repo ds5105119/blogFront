@@ -35,13 +35,13 @@ export default function AnimatedGradientText(props: {
 
   return (
     <div className="text-cente">
-      <h2 className="text-3xl md:text-3xl font-bold tracking-wide">
+      <h2 className="text-4xl md:text-4xl font-bold tracking-wide">
         <span
           className={`bg-gradient-to-r ${gradients[index]} text-transparent bg-clip-text transition-all duration-500`}
         >
           {displayText}
         </span>
-        <span className="animate-blink">|</span>
+        <span className="animate-blink font-medium">|</span>
       </h2>
     </div>
   );

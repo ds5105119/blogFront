@@ -26,6 +26,10 @@ const config: Config = {
       animation: {
         blink: "blink 1s step-start infinite",
       },
+      boxShadow: {
+        primary:
+          "0px 0px 0px 1px rgba(9, 9, 11, 0.07), 0px 2px 2px 0px rgba(9, 9, 11, 0.05)",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
