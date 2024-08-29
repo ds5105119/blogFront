@@ -6,17 +6,17 @@ import axios, {
 } from "axios";
 import {
   getAccessToken,
-  getRefreshToken,
   setAccessToken,
   clearTokens,
   isTokenExpired,
 } from "@/lib/authToken";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 // request interceptors
@@ -45,37 +45,32 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const refreshToken = getRefreshToken();
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    if (
-      !refreshToken ||
-      error.response?.status !== 401 ||
-      originalRequest._retry
-    ) {
+    if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
-    const response = await axios.post(
-      `${process.env.BACKEND_URL}${process.env.REFRESH_TOKEN_URI}`,
-      {
-        refresh: refreshToken,
-      },
-    );
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}${process.env.REFRESH_TOKEN_URI}`,
+        {},
+        { withCredentials: true },
+      );
 
-    // token refresh sucess
-    if (response.status === 200) {
-      setAccessToken(response.data.access);
-      originalRequest.headers = {
-        ...originalRequest.headers,
-        Authorization: `Bearer ${response.data.access}`,
-      };
-      return axiosInstance(originalRequest);
-    } else {
+      if (response.status === 200) {
+        setAccessToken(response.data.access);
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${response.data.access}`,
+        };
+        return axiosInstance(originalRequest);
+      }
+    } catch (refreshError) {
       clearTokens();
     }
 

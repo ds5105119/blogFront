@@ -31,7 +31,7 @@ export default function AnimatedGradientText(props: {
     }
 
     return () => clearTimeout(timer);
-  }, [displayText, index, isDeleting]);
+  }, [displayText, index, isDeleting, texts]);
 
   return (
     <div className="text-cente">
