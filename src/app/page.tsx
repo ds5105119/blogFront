@@ -2,20 +2,23 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import Button from "@/components/button";
-import Navbar from "@/components/navBar";
+import Navbar from "@/components/navbar/navBar";
 
-const Editor = dynamic(() => import("@/components/editor/Editor"), {
-  ssr: false,
-});
-
-const MDXEditorProps = {
-  markdown: "just start..",
-};
+const Editor = dynamic(
+  () => import("@/components/editor/initializedMDXEditor"),
+  {
+    ssr: false,
+  },
+);
 
 export default function Home() {
+  const currentTab = {
+    Home: true,
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Navbar></Navbar>
+    <main className="flex min-h-[1000px] flex-col items-center justify-between">
+      <Navbar currentTab={currentTab}></Navbar>
 
       <div style={{ border: "1px solid black" }}>
         <Suspense fallback={null}>

@@ -1,4 +1,17 @@
-// 유저
+// Auth Type
+export type AuthType = {
+  pk: number;
+  handle: string;
+  email: string;
+};
+
+// Access Token and USer
+export type LoginType = {
+  access: string;
+  user: AuthType;
+};
+
+// User
 export type User = {
   handle: string;
   username: string;
@@ -10,21 +23,26 @@ export type User = {
   followers_count: number;
 };
 
-// 토큰 및 유저
-export type LoginType = {
-  access: string;
-  user: {
-    pk: number;
-    handle: string;
-    email: string;
-  };
+// Profile
+export type Profile = {
+  user: User;
+  bio: string;
+  link: string;
+  profile_image: string;
 };
 
-// useAuth Login hook
-export type UseLoginReturn = {
-  mutate: (variables: { code: string; url: string }) => void;
-  isPending: boolean;
+export type useAuthReturn = {
+  user: Profile | undefined;
   isError: boolean;
+  isLoading: boolean;
   error: unknown;
   isSuccess: boolean;
+  login: UseMutationResult<
+    { code: string },
+    AxiosError,
+    {
+      access: string;
+      user: User;
+    }
+  >;
 };

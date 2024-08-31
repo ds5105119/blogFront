@@ -4,12 +4,7 @@ import axios, {
   AxiosError,
   AxiosHeaders,
 } from "axios";
-import {
-  getAccessToken,
-  setAccessToken,
-  clearTokens,
-  isTokenExpired,
-} from "@/lib/authToken";
+import { getAccessToken, setAccessToken, clearTokens } from "@/lib/authToken";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -24,18 +19,10 @@ axiosInstance.interceptors.request.use(
   // AccessToken is Valid
   (config: InternalAxiosRequestConfig) => {
     const accessToken: string | null = getAccessToken();
-
-    if (!accessToken) {
-      return config;
-    }
-
-    if (!isTokenExpired(accessToken)) {
-      (config.headers as AxiosHeaders).set(
-        "Authorization",
-        `Bearer ${accessToken}`,
-      );
-    }
-
+    (config.headers as AxiosHeaders).set(
+      "Authorization",
+      `Bearer ${accessToken}`,
+    );
     return config;
   },
   (error: AxiosError) => Promise.reject(error),

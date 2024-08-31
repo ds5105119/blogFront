@@ -1,60 +1,15 @@
-"use client";
+import dynamic from "next/dynamic";
+import { forwardRef } from "react";
+import { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
 
-import Toolbar from "./Toolbar";
-import type { ForwardedRef } from "react";
-import {
-  headingsPlugin,
-  listsPlugin,
-  quotePlugin,
-  thematicBreakPlugin,
-  markdownShortcutPlugin,
-  toolbarPlugin,
-  codeBlockPlugin,
-  codeMirrorPlugin,
-  MDXEditor,
-  type MDXEditorMethods,
-  type MDXEditorProps,
-} from "@mdxeditor/editor";
-import "@mdxeditor/editor/style.css";
+const InitializedMDXEditor = dynamic(() => import("./initializedMDXEditor"), {
+  ssr: false,
+});
 
-const codeBlockLanguages = {
-  js: "JavaScript",
-  ts: "Typescript",
-  tsx: "TypeScript (React)",
-  python: "Python",
-  css: "CSS",
-};
+const Editor = forwardRef<MDXEditorMethods, MDXEditorProps>((props, ref) => (
+  <InitializedMDXEditor {...props} editorRef={ref} />
+));
 
-export default function Editor({
-  editorRef,
-  ...props
-}: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
-  return (
-    <MDXEditor
-      plugins={[
-        // ToolBar Plugin
-        toolbarPlugin({
-          toolbarContents: Toolbar,
-        }),
+Editor.displayName = "Editor";
 
-        // Core Plugin
-        headingsPlugin(),
-        listsPlugin(),
-        quotePlugin(),
-        thematicBreakPlugin(),
-        markdownShortcutPlugin(),
-
-        // CodeBlock Plugiin
-        codeBlockPlugin({
-          defaultCodeBlockLanguage: "js",
-        }),
-        codeMirrorPlugin({
-          codeBlockLanguages: codeBlockLanguages,
-        }),
-      ]}
-      {...props}
-      ref={editorRef}
-      contentEditableClassName="prose"
-    />
-  );
-}
+export default Editor;

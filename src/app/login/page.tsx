@@ -1,12 +1,13 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AnimatedGradientText from "@/components/animatedGradientText";
 import GoogleLoginButton from "@/components/googleLoginButton";
-import NavBar from "@/components/navBar";
+import NavBar from "@/components/navbar/navBar";
 import { generateRandomString, openCenteredWindow } from "@/lib/tools";
-import { useLogin } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
+import Loading from "../loading";
 
 const texts = ["안녕하세요", "Hello", "Bonjour", "你好", "こんにちは"];
 const gradients = [
@@ -18,18 +19,24 @@ const gradients = [
 ];
 
 export default function Login() {
+  // 기본 상수
+  const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    user,
+    isError: authIsError,
+    isLoading: authIsLoading,
+    error: authError,
+    isSuccess: authIsSuccess,
+    login,
+  } = useAuth();
+  const currentTab = {};
+
   // 이전 URL
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl =
     searchParams.get("returnUrl") ?? process.env.NEXT_PUBLIC_BASE_URL;
-
-  // code 관련
-  const [isLoading, setIsLoading] = useState(false);
-  const [code, setCode] = useState("");
-
-  // token 관련
-  const { mutate, isPending, isError, error, isSuccess } = useLogin();
 
   // 로그인 성공시 redirect
   const handleLoginSuccess = () => {
@@ -43,14 +50,11 @@ export default function Login() {
   // Get JWT Token(for Google Users)
   const handelGetGoogleToken = () => {
     setIsLoading(true);
-    mutate({
+    login.mutate({
       code: code,
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}${process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URI}`,
     });
     setIsLoading(false);
-    if (isSuccess && !isError && !isPending) {
-      // handleLoginSuccess();
-    }
   };
 
   // Get Google Login Code
@@ -81,15 +85,30 @@ export default function Login() {
           setCode(receivedCode);
           localStorage.removeItem("googleAuthCode");
           localStorage.removeItem("googleAuthState");
-          handelGetGoogleToken();
         }
       }
     }, 500);
   };
 
+  useEffect(() => {
+    if (code) {
+      handelGetGoogleToken();
+    }
+  }, [code]);
+
+  useEffect(() => {
+    if (authIsSuccess) {
+      handleLoginSuccess();
+    }
+  }, [authIsSuccess]);
+
+  if (!!authIsLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <NavBar />
+      <NavBar currentTab={currentTab} />
       <div className="flex flex-col items-center justify-center flex-grow ">
         <div className="bg-white p-8 rounded-2xl shadow-primary max-w-md w-full mx-4 transform hover:scale-[1.02] transition-all duration-300">
           <div className="text-center">
