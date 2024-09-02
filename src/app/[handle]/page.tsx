@@ -49,7 +49,6 @@ const DynamicPage = ({ params }: { params: { handle: string } }) => {
 
   const handleFollow = () => {
     setIsFollowing(!isFollowing);
-    // 여기에 실제 팔로우/언팔로우 API 호출 로직을 추가해야 합니다.
   };
 
   return (

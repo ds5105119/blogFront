@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FaCompass, FaRegCompass } from "react-icons/fa6";
 import { GoHome, GoHomeFill } from "react-icons/go";
@@ -13,37 +11,35 @@ import NavBarMenu from "./navBarMenu";
 import { AuthType } from "@/types/auth";
 import { getAuth, clearTokens } from "@/lib/authToken";
 
-type StringIndexedArray<T> = {
-  [key: string]: T;
+type booleanObject = {
+  [key: string]: boolean;
 };
 
-export default function NavBar(props: {
-  currentTab?: StringIndexedArray<boolean>;
-}) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const [auth, setAuth] = useState<AuthType | null>(null);
-  const tabStatus: StringIndexedArray<boolean> =
-    props.currentTab ?? queryClient.getQueryData(["tabStatus"]) ?? {};
-  const [isClient, setIsClient] = useState(false);
+type navBarProps = {
+  currentTab?: booleanObject;
+  auth?: AuthType;
+};
 
-  const toggleExploreTab = () => {};
+const NavBar = ({ currentTab, auth }: navBarProps) => {
+  const router = useRouter();
+  const tabStatus: booleanObject = currentTab ?? {};
+  const profileURL = !!auth ? `/${auth.handle}` : `/login`;
+
+  const toggleExploreTab = () => {
+    router.push("/explore");
+  };
   const toggleHomeTab = () => {
     router.push("/");
   };
-  const toggleSearchTab = () => {};
-  const toggleProfileTab = () => {
-    if (!!auth) {
-      router.push(`${process.env.NEXT_PUBLIC_BASE_URL}${auth.handle}`);
-    } else {
-      router.push(`login`);
-    }
+  const toggleSearchTab = () => {
+    router.push("/search");
   };
-
-  useEffect(() => {
-    setAuth(getAuth());
-    console.log(auth);
-  }, []);
+  const toggleProfileTab = () => {
+    router.push(profileURL);
+  };
+  const toggleMenu = () => {
+    // TODO
+  };
 
   return (
     <nav
@@ -148,15 +144,6 @@ export default function NavBar(props: {
       </div>
     </nav>
   );
-}
+};
 
-/** 
- * <NavBarButton onClick={onClick} className={className}>
-          <span className="sr-only">홈</span>
-          {tabStatus["menu"] ? (
-            <HiMenuAlt3 className="cursor-pointer w-[28px] h-[28px] group-hover:w-[30px] group-hover:h-[30px] transition-all duration-150" />
-          ) : (
-            <HiMenuAlt3 className="cursor-pointer w-[28px] h-[28px] stroke-[0.2px] group-hover:w-[30px] group-hover:h-[30px] transition-all duration-150" />
-          )}
-        </NavBarButton>
-*/
+export default NavBar;
