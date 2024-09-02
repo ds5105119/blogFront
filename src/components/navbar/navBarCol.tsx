@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaCompass, FaRegCompass } from "react-icons/fa6";
 import { GoHome, GoHomeFill } from "react-icons/go";
 import { RiCommandFill } from "react-icons/ri";
+import { HiMenuAlt3 } from "react-icons/hi";
 import UserProfile from "../navBarUserProfile";
-import { AuthType } from "@/types/auth";
-import { getAuth } from "@/lib/authToken";
 import NavBarButton from "./navBarButton";
+import NavBarMenu from "./navBarMenu";
+import { AuthType } from "@/types/auth";
+import { getAuth, clearTokens } from "@/lib/authToken";
 
 type StringIndexedArray<T> = {
   [key: string]: T;
@@ -19,18 +20,11 @@ export default function NavbarCol(props: {
   currentTab?: StringIndexedArray<boolean>;
 }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const auth: AuthType | null = getAuth();
-
-  const [tabStatus, setTabStatus] = useState<StringIndexedArray<boolean>>(
-    props.currentTab ??
-      queryClient.getQueryData(["tabStatus"]) ?? {
-        Profile: false,
-        Explore: false,
-        Search: false,
-        Home: true,
-      },
+  const [auth, setAuth] = useState<AuthType | null>(null);
+  const [profileURL, setProfileURL] = useState(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
   );
+  const tabStatus: StringIndexedArray<boolean> = props.currentTab ?? {};
 
   const toggleExploreTab = () => {};
   const toggleHomeTab = () => {
@@ -38,20 +32,32 @@ export default function NavbarCol(props: {
   };
   const toggleSearchTab = () => {};
   const toggleProfileTab = () => {
-    if (!!auth) {
-      router.push(`${process.env.NEXT_PUBLIC_BASE_URL}/${auth.handle}`);
-    } else {
-      router.push(`${process.env.NEXT_PUBLIC_BASE_URL}/login`);
-    }
+    router.push(profileURL);
   };
 
+  useEffect(() => {
+    setAuth(getAuth);
+  }, []);
+
+  useEffect(() => {
+    setProfileURL(
+      !!auth
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/${auth.handle}`
+        : `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+    );
+  }, [auth]);
+
+  useEffect(() => {
+    console.log(profileURL);
+  }, [profileURL]);
+
   return (
-    <nav className="w-full bg-white shadow-primary">
-      <div className="mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-14">
+    <nav className="h-screen w-24 bg-white shadow-primary">
+      <div className="mx-auto px-5 h-full">
+        <div className="flex flex-col justify-between h-full items-center">
           {/* Logo */}
-          <div className="w-24 flex items-center">
-            <div className="flex w-full items-center">
+          <div className="w-full py-8 flex items-center justify-center">
+            <div className="w-full py-8 flex items-center justify-center">
               <button
                 onClick={toggleHomeTab}
                 type="button"
@@ -81,9 +87,9 @@ export default function NavbarCol(props: {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-col items-center space-y-4">
             <NavBarButton onClick={toggleProfileTab} className="w-20 h-14">
-              <span className="sr-only">홈</span>
+              <span className="sr-only">프로필</span>
               {tabStatus["Profile"] ? (
                 <UserProfile className="cursor-pointer border-gray-700 border-[2.5px] w-[27px] h-[27px] group-hover:w-[29px] group-hover:h-[29px] transition-all duration-150" />
               ) : (
@@ -116,14 +122,12 @@ export default function NavbarCol(props: {
             </NavBarButton>
           </div>
 
-          {/* Login */}
-          <div className="w-24 flex items-center justify-end">
-            <a
-              href="#"
-              className="bg-black text-white hover:bg-black px-5 py-2 rounded-lg text-sm font-medium"
-            >
-              로그인
-            </a>
+          {/* Menu */}
+          <div className="flex my-12 w-20 h-14 group align-middle items-center justify-center bg-white rounded-lg hover:brightness-95 transition duration-250">
+            <div className="flex align-middle items-center justify-center p-3 rounded-md text-black hover:text-gray-600 transition duration-300">
+              <span className="sr-only">검색</span>
+              <HiMenuAlt3 className="cursor-pointer w-[27px] h-[27px] group-hover:w-[29px] group-hover:h-[29px] transition-all duration-150" />
+            </div>
           </div>
         </div>
       </div>

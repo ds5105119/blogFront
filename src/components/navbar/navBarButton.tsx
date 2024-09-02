@@ -10,21 +10,16 @@ const NavBarButton: React.FC<NavBarButtonProps> = ({
   onClick,
   className = "",
   children,
-  ...props
 }) => {
   return (
-    <div
+    <button
+      onClick={onClick}
       className={`group inline-flex items-center justify-center bg-white rounded-lg hover:brightness-95 transition duration-250 ${className}`}
     >
-      <button
-        onClick={onClick}
-        type="button"
-        className="inline-flex items-center justify-center p-3 rounded-md text-black hover:text-gray-600 transition duration-300"
-        {...props}
-      >
+      <div className="inline-flex items-center justify-center p-3 rounded-md text-black hover:text-gray-600 transition duration-300">
         {children}
-      </button>
-    </div>
+      </div>
+    </button>
   );
 };
 

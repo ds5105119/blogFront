@@ -10,6 +10,7 @@ import {
   CreateLink,
   InsertCodeBlock,
   InsertImage,
+  ListsToggle,
   Separator,
 } from "@mdxeditor/editor";
 
@@ -27,12 +28,15 @@ const Toolbar = () => (
             <Separator />
 
             <BoldItalicUnderlineToggles />
+            <ListsToggle />
+            <Separator />
+
             <CodeToggle />
             <InsertCodeBlock />
             <Separator />
 
-            <InsertImage />
             <BlockTypeSelect />
+            <InsertImage />
             <CreateLink />
           </>
         ),

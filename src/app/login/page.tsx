@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AnimatedGradientText from "@/components/animatedGradientText";
 import GoogleLoginButton from "@/components/googleLoginButton";
-import NavBar from "@/components/navbar/navBar";
+import NavbarCol from "@/components/navbar/navBarCol";
 import { generateRandomString, openCenteredWindow } from "@/lib/tools";
 import { useAuth } from "@/hooks/useAuth";
 import Loading from "../loading";
@@ -107,9 +107,9 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <NavBar currentTab={currentTab} />
-      <div className="flex flex-col items-center justify-center flex-grow ">
+    <div className="flex min-h-screen bg-white">
+      <NavbarCol currentTab={currentTab} />
+      <div className="flex items-center justify-center flex-grow w-full">
         <div className="bg-white p-8 rounded-2xl shadow-primary max-w-md w-full mx-4 transform hover:scale-[1.02] transition-all duration-300">
           <div className="text-center">
             <p className="text-gray-600 mb-8">

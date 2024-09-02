@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Toolbar from "./toolbar";
-import imageUploadHandler from "./imageUploadHandler";
+import imageUploadHandler from "@/lib/\beditor/imageUploadHandler";
 import type { ForwardedRef } from "react";
 import {
   headingsPlugin,
@@ -56,7 +56,7 @@ export default function InitializedMDXEditor({
         }),
 
         // Image Upload Plugin
-        imagePlugin({ imageUploadHandler })
+        imagePlugin({ imageUploadHandler }),
       ]}
       {...props}
       ref={editorRef}

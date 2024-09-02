@@ -34,6 +34,7 @@ const config: Config = {
       },
       colors: {
         "regal-blue": "#243c5a",
+        "bg-gray-50": "rgb(250, 250, 250)",
       },
       keyframes: {
         blink: {
@@ -41,13 +42,20 @@ const config: Config = {
           "50%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        slideUp: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
       },
       animation: {
         blink: "blink 1s step-start infinite",
+        "slide-up": "slideUp 0.1s ease-out",
       },
       boxShadow: {
         primary:
-          "0px 0px 0px 1px rgba(9, 9, 11, 0.07), 0px 2px 2px 0px rgba(9, 9, 11, 0.05)",
+          "0px 0px 0px 1px rgba(9, 9, 11, 0.07), 0px 4px 4px 0px rgba(9, 9, 11, 0.05)",
+        secondary:
+          "0px 0px 0px 1px rgba(9, 9, 11, 0.07), 0px 6px 6px 0px rgba(9, 9, 11, 0.05)",
       },
     },
   },
